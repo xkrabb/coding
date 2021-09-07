@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <div id="container"></div>
+        <script src="./min-react-v1.js"></script>
+        <script>
+            // 通过babel转成jsx元素
+            /** @jsx Didact.createElement */
+
+            class HelloMessage extends Didact.Component {
+                constructor(props) {
+                    super(props);
+                    this.state = {
+                        count: 1
+                    };
+                }
+
+                handleClick() {
+                    this.setState({
+                        count: this.state.count + 1
+                    });
+                }
+
+                render() {
+                    const name = this.props.name;
+                    const times = this.state.count;
+                    // return <div onClick={(e) => this.handleClick()}>Hello {name + '!'.repeat(times)}</div>;
+                    return Didact.createElement(
+                        'div',
+                        {
+                            onClick: (e) => this.handleClick()
+                        },
+                        'Hello ',
+                        name + '!'.repeat(times)
+                    );
+                }
+            }
+
+            // Didact.render(<HelloMessage name="John" />, document.getElementById('container'));
+            Didact.render(
+                Didact.createElement(HelloMessage, {
+                    name: 'John'
+                }),
+                document.getElementById('container')
+            );
+        </script>
+    </body>
+</html>
