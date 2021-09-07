@@ -40,6 +40,19 @@ function render(element, parentDom) {
     parentDom.appendChild(dom);
 }
 
+function createElement(type, config, ...args) {
+    const props = { ...config };
+    const children = args.length > 0 ? [...args] : [];
+    props.children = children
+        .filter((c) => c != null && c !== false)
+        .map((c) => (c instanceof Object ? c : createTextElement(c)));
+}
+
+function createTextElement(text) {
+    return createElement(TEXT_ELEMENT, { nodeValue: text });
+}
+
 const Didact = {
-    render
+    render,
+    createElement
 };
