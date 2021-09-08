@@ -1,18 +1,4 @@
-/**
- * Didact元素，jsx元素转换结果，
-const element = {
-    type: 'div',
-    props: {
-        id: 'container',
-        children: [
-            { type: 'input', props: { value: 'foo', type: 'text' } },
-            { type: 'a', props: { href: '/bar' } },
-            { type: 'span', props: {} }
-        ]
-    }
-};
- * 
- */
+// React v16 之前的架构
 
 const TEXT_ELEMENT = 'TEXT ELEMENT';
 let rootInstance = null;
