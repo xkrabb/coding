@@ -32,15 +32,25 @@ function reconcile(parentDom, instance, element) {
     } else if (element == null) {
         parentDom.removeChild(instance.dom);
         return null;
-    } else if (element.type === instance.element.type) {
+    } else if (element.type !== instance.element.type) {
+        const newInstance = instantiate(element);
+        parentDom.replaceChild(newInstance.dom);
+        return newInstance;
+    } else if (typeof element.type === 'string') {
         updateDomProperties(instance.dom, instance.element.props, element.props);
         instance.childInstances = reconcileChildren(instance, element);
         instance.element = element;
         return instance;
     } else {
-        const newInstance = instantiate(element);
-        parentDom.replaceChild(newInstance.dom);
-        return newInstance;
+        // 类组件处理
+        instance.publicInstance.props = element.props;
+        const childElement = instance.publicInstance.render();
+        const oldChildInstance = instance.childInstance;
+        const childInstance = reconcile(parentDom, oldChildInstance, childElement);
+        instance.dom = childInstance.dom;
+        instance.childInstance = childInstance;
+        instance.element = element;
+        return instance;
     }
 }
 
@@ -61,16 +71,30 @@ function reconcileChildren(instance, element) {
 // 根据didact元素构建带dom的实例 {dom, element, childInstances}
 function instantiate(element) {
     const { type, props } = element;
-    const dom = type === TEXT_ELEMENT ? document.createTextNode('') : document.createElement(type);
+    const isDomElement = typeof type === 'string';
 
-    updateDomProperties(dom, [], element.props);
+    if (isDomElement) {
+        const dom = type === TEXT_ELEMENT ? document.createTextNode('') : document.createElement(type);
 
-    const childElements = props.children || [];
-    const childInstances = childElements.map(instantiate);
-    const childDoms = childInstances.map((childInstance) => childInstance.dom);
-    childDoms.forEach((childDom) => dom.appendChild(childDom));
+        updateDomProperties(dom, [], element.props);
 
-    return { dom, element, childInstances };
+        const childElements = props.children || [];
+        const childInstances = childElements.map(instantiate);
+        const childDoms = childInstances.map((childInstance) => childInstance.dom);
+
+        childDoms.forEach((childDom) => dom.appendChild(childDom));
+
+        return { dom, element, childInstances };
+    } else {
+        const instance = {};
+        const publicInstance = createPublicInstance(element, instance);
+        const childElement = publicInstance.render();
+        const childInstance = instantiate(childElement);
+        const dom = childInstance.dom;
+
+        Object.assign(instance, { dom, element, childInstance, publicInstance });
+        return instance;
+    }
 }
 
 function updateDomProperties(dom, prevProps, nextProps) {
@@ -100,6 +124,35 @@ function updateDomProperties(dom, prevProps, nextProps) {
         .forEach((key) => (dom[key] = nextProps[key]));
 }
 
+// 创建类实例
+function createPublicInstance(element, internalInstance) {
+    const { type, props } = element;
+    const publicInstance = new type(props);
+    // 当前页面实例，用于更新对比
+    publicInstance.__internalInstance = internalInstance;
+    return publicInstance;
+}
+
+// 类组件
+class Component {
+    constructor(props) {
+        this.props = props;
+        this.state = this.state || {};
+    }
+    setState(partialState) {
+        this.state = { ...this.state, ...partialState };
+        updateInstance(this.__internalInstance);
+    }
+}
+
+// 更新
+function updateInstance(internalInstance) {
+    const parentDom = internalInstance.dom.parentNode;
+    const element = internalInstance.element;
+    reconcile(parentDom, internalInstance, element);
+}
+
+// jsx元素转didact元素
 function createElement(type, config, ...args) {
     const props = { ...config };
     const children = args.length > 0 ? [...args] : [];
@@ -116,5 +169,6 @@ function createTextElement(text) {
 
 const Didact = {
     render,
-    createElement
+    createElement,
+    Component
 };
