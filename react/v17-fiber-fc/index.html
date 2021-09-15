@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script src="./index.js"></script>
+        <script>
+            // babel将html标签转jsx预发，可指定转换方法
+            // /** @jsx Didact.createElement */
+            const element = Didact.createElement(
+                'div',
+                {
+                    id: 'foo'
+                },
+                Didact.createElement('a', null, 'bar'),
+                Didact.createElement('b', null, 'blod')
+            );
+            const container = document.getElementById('root');
+            Didact.render(element, container);
+        </script>
+    </body>
+</html>
