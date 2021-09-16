@@ -10,6 +10,7 @@ function createElement(type, props, ...children) {
         }
     };
 }
+
 // 纯文本节点转didact元素
 function createTextElement(text) {
     return {
@@ -20,6 +21,7 @@ function createTextElement(text) {
         }
     };
 }
+
 // 创建dom
 function createDom(fiber) {
     const { type, props } = fiber;
@@ -35,6 +37,7 @@ function createDom(fiber) {
 
     return dom;
 }
+
 function render(element, container) {
     nextUnitOfWork = {
         dom: container, // stateNode
@@ -42,9 +45,11 @@ function render(element, container) {
             children: [element]
         }
     };
+    wipRoot = nextUnitOfWork;
 }
 
 let nextUnitOfWork = null;
+let wipRoot = null;
 
 function workLoop(deadline) {
     let shouldYield = false;
@@ -52,9 +57,15 @@ function workLoop(deadline) {
         nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
         shouldYield = deadline.timeRemaining() < 1;
     }
+
+    if (!nextUnitOfWork && wipRoot) {
+        commitRoot();
+    }
+
     // 下次空闲执行
     requestIdleCallback(workLoop);
 }
+
 // 空闲时候启动
 requestIdleCallback(workLoop);
 
@@ -102,6 +113,21 @@ function performUnitOfWork(fiber) {
         }
         nextFiber = nextFiber.parent;
     }
+}
+
+function commitRoot() {
+    commitWork(wipRoot.child);
+    wipRoot = null;
+}
+
+function commitWork(fiber) {
+    if (!fiber) {
+        return;
+    }
+    const domParent = fiber.parent.dom;
+    domParent.appendChild(fiber.dom);
+    commitWork(fiber.child);
+    commitWork(fiber.sibling);
 }
 
 const Didact = {
