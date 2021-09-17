@@ -26,16 +26,41 @@ function createTextElement(text) {
 function createDom(fiber) {
     const { type, props } = fiber;
     const dom = type === 'TEXT_ELEMENT' ? document.createTextNode('') : document.createElement(type);
-    const isAttr = (key) => key !== 'children' && key !== 'style';
-    // const isEvent = (key) => key.startsWith('on');
+    updateDom(dom, {}, props);
+    return dom;
+}
 
-    Object.keys(props)
-        .filter(isAttr)
+const isEvent = (key) => key.startsWith('on');
+const isAttr = (key) => key !== 'children' && key !== 'style' && !isEvent(key);
+const isNew = (prev, next) => (key) => prev[key] !== next[key];
+const isGone = (prev, next) => (key) => !(key in next);
+// 只更新属性
+function updateDom(dom, prevProps, nextProps) {
+    Object.keys(prevProps)
+        .filter(isEvent)
+        .filter((key) => isGone(prevProps, nextProps)(key) || isNew(prevProps, nextProps)(key))
         .forEach((key) => {
-            dom[key] = props[key];
+            const eventType = key.toLowerCase().substring(2);
+            dom.removeEventListener(eventType, prevProps[key]);
         });
 
-    return dom;
+    Object.keys(prevProps)
+        .filter(isAttr)
+        .filter(isGone(prevProps, nextProps))
+        .forEach((key) => (dom[key] = ''));
+
+    Object.keys(nextProps)
+        .filter(isAttr)
+        .filter(isNew(prevProps, nextProps))
+        .forEach((key) => (dom[key] = nextProps[key]));
+
+    Object.keys(nextProps)
+        .filter(isEvent)
+        .filter(isNew(prevProps, nextProps))
+        .forEach((key) => {
+            const eventType = key.toLowerCase().substring(2);
+            dom.addEventListener(eventType, nextProps[key]);
+        });
 }
 
 function render(element, container) {
@@ -43,13 +68,17 @@ function render(element, container) {
         dom: container, // stateNode
         props: {
             children: [element]
-        }
+        },
+        alternate: currentRoot
     };
+    deletions = [];
     wipRoot = nextUnitOfWork;
 }
 
-let nextUnitOfWork = null;
-let wipRoot = null;
+let nextUnitOfWork = null; // 递归构建的当前fiber
+let wipRoot = null; // commit前root fiber
+let currentRoot = null; // 当前页面root fiber
+let deletions = null; // 待删除 fibers
 
 function workLoop(deadline) {
     let shouldYield = false;
@@ -76,31 +105,9 @@ function performUnitOfWork(fiber) {
     if (!fiber.dom) {
         fiber.dom = createDom(fiber);
     }
-    if (fiber.parent) {
-        fiber.parent.dom.appendChild(fiber.dom);
-    }
 
     const elements = fiber.props.children || [];
-    let index = 0;
-    let prevSibling = null;
-    while (index < elements.length) {
-        const element = elements[index];
-        const newFiber = {
-            type: element.type,
-            props: element.props,
-            parent: fiber,
-            dom: null
-        };
-        // 递 - 构建
-        if (index === 0) {
-            // !fiber.child
-            fiber.child = newFiber;
-        } else {
-            prevSibling.sibling = newFiber;
-        }
-        prevSibling = newFiber;
-        index++;
-    }
+    reconcileChildren(fiber, elements);
 
     // 归 - 返回
     if (fiber.child) {
@@ -115,8 +122,60 @@ function performUnitOfWork(fiber) {
     }
 }
 
+// 子元素处理
+function reconcileChildren(wipFiber, elements) {
+    let index = 0;
+    let oldFiber = wipFiber.alternate && wipFiber.alternate.child;
+    let prevSibling = null;
+
+    while (index < elements.length || oldFiber != null) {
+        const element = elements[index];
+        let newFiber = null;
+        const sameType = element && oldFiber && element.type === oldFiber.type;
+
+        if (sameType) {
+            newFiber = {
+                type: oldFiber.type,
+                props: element.props,
+                dom: oldFiber.dom,
+                parent: wipFiber,
+                alternate: oldFiber,
+                effectTag: 'UPDATE'
+            };
+        } else if (element && !sameType) {
+            newFiber = {
+                type: element.type,
+                props: element.props,
+                dom: null,
+                parent: wipFiber,
+                alternate: null,
+                effectTag: 'PLACEMENT'
+            };
+        } else if (oldFiber && !sameType) {
+            oldFiber.effectTag = 'DELETION';
+            deletions.push(oldFiber);
+        }
+
+        if (oldFiber) {
+            oldFiber = oldFiber.sibling;
+        }
+
+        // 递 - 构建
+        if (index === 0) {
+            // !fiber.child
+            wipFiber.child = newFiber;
+        } else {
+            prevSibling.sibling = newFiber;
+        }
+        prevSibling = newFiber;
+        index++;
+    }
+}
+
 function commitRoot() {
+    deletions.forEach(commitWork);
     commitWork(wipRoot.child);
+    currentRoot = wipRoot; // 挂载完成后，保存当前页面root fiber
     wipRoot = null;
 }
 
@@ -124,8 +183,16 @@ function commitWork(fiber) {
     if (!fiber) {
         return;
     }
+
     const domParent = fiber.parent.dom;
-    domParent.appendChild(fiber.dom);
+    if (fiber.effectTag === 'PLACEMENT' && fiber.dom != null) {
+        domParent.appendChild(fiber.dom);
+    } else if (fiber.effectTag === 'UPDATE' && fiber.dom != null) {
+        updateDom(fiber.dom, fiber.alternate.props, fiber.props);
+    } else if (fiber.effectTag === 'DELETION') {
+        domParent.removeChild(fiber.dom);
+    }
+
     commitWork(fiber.child);
     commitWork(fiber.sibling);
 }
