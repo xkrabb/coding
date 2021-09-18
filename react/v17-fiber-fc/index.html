@@ -12,14 +12,13 @@
         <script>
             // babel将html标签转jsx预发，可指定转换方法
             // /** @jsx Didact.createElement */
-            const element = Didact.createElement(
-                'div',
-                {
-                    id: 'foo'
-                },
-                Didact.createElement('a', null, 'bar'),
-                Didact.createElement('b', null, 'blod')
-            );
+            function App(props) {
+                return Didact.createElement('h1', null, 'Hi ', props.name);
+            }
+
+            const element = Didact.createElement(App, {
+                name: 'foo'
+            });
             const container = document.getElementById('root');
             Didact.render(element, container);
         </script>

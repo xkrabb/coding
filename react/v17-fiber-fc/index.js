@@ -99,15 +99,13 @@ function workLoop(deadline) {
 requestIdleCallback(workLoop);
 
 function performUnitOfWork(fiber) {
-    // add dom node
-    // crate children new fiber
-    // return next unit of work
-    if (!fiber.dom) {
-        fiber.dom = createDom(fiber);
-    }
+    const isFunctionComponent = fiber.type instanceof Function;
 
-    const elements = fiber.props.children || [];
-    reconcileChildren(fiber, elements);
+    if (isFunctionComponent) {
+        updateFunctionComponent(fiber);
+    } else {
+        updateHostComponent(fiber);
+    }
 
     // 归 - 返回
     if (fiber.child) {
@@ -120,6 +118,21 @@ function performUnitOfWork(fiber) {
         }
         nextFiber = nextFiber.parent;
     }
+}
+
+function updateFunctionComponent(fiber) {
+    // 单节点
+    const children = [fiber.type(fiber.props)];
+    reconcileChildren(fiber, children);
+}
+
+function updateHostComponent(fiber) {
+    if (!fiber.dom) {
+        fiber.dom = createDom(fiber);
+    }
+
+    const elements = fiber.props.children || [];
+    reconcileChildren(fiber, elements);
 }
 
 // 子元素处理
@@ -184,17 +197,30 @@ function commitWork(fiber) {
         return;
     }
 
-    const domParent = fiber.parent.dom;
+    let parentFiber = fiber.parent;
+    while (!parentFiber.dom) {
+        parentFiber = parentFiber.parent;
+    }
+    const domParent = parentFiber.dom;
+
     if (fiber.effectTag === 'PLACEMENT' && fiber.dom != null) {
         domParent.appendChild(fiber.dom);
     } else if (fiber.effectTag === 'UPDATE' && fiber.dom != null) {
         updateDom(fiber.dom, fiber.alternate.props, fiber.props);
     } else if (fiber.effectTag === 'DELETION') {
-        domParent.removeChild(fiber.dom);
+        commitDeletion(fiber, domParent);
     }
 
     commitWork(fiber.child);
     commitWork(fiber.sibling);
+}
+
+function commitDeletion(fiber, parentDom) {
+    if (fiber.dom) {
+        parentDom.removeChildren(fiber.dom);
+    } else {
+        commitDeletion(fiber.child, parentDom);
+    }
 }
 
 const Didact = {
