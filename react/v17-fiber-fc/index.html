@@ -10,15 +10,20 @@
         <div id="root"></div>
         <script src="./index.js"></script>
         <script>
-            // babel将html标签转jsx预发，可指定转换方法
-            // /** @jsx Didact.createElement */
-            function App(props) {
-                return Didact.createElement('h1', null, 'Hi ', props.name);
+            /** @jsx Didact.createElement */
+            function Counter() {
+                const [state, setState] = Didact.useState(1);
+                return Didact.createElement(
+                    'h1',
+                    {
+                        onClick: () => setState((c) => c + 1)
+                    },
+                    'Count: ',
+                    state
+                );
             }
 
-            const element = Didact.createElement(App, {
-                name: 'foo'
-            });
+            const element = Didact.createElement(Counter, null);
             const container = document.getElementById('root');
             Didact.render(element, container);
         </script>
