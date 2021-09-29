@@ -1,4 +1,24 @@
-// performSyncWorkOnRoot调用该方法
+function render(element, container, callback) {
+    legacyRenderSubtreeIntoContainer(null, element, container, false, callback);
+}
+
+function legacyRenderSubtreeIntoContainer(parentComponent, children, container, forceHydrate, callback) {
+    let root = container._reactRootContainer;
+    if (!root) {
+        root = container._reactRootContainer = legacyCreateRootFromDOMContainer(container, forceHydrate);
+        fiberRoot = root;
+        flushSyncWithoutWarningIfAlreadyRendering(() => {
+            updateContainer(children, fiberRoot, parentComponent, callback);
+        });
+    } else {
+        updateContainer(children, fiberRoot, parentComponent, callback);
+    }
+    return getPublicRootInstance(fiberRoot);
+}
+
+// 更新起点 scheduleUpdateOnFiber - ensureRootIsScheduled - performSyncWorkOnRoot
+
+// performSyncWorkOnRoot调用该方法 还会调用 commitRoot(root);
 function workLoopSync() {
     while (workInProgress !== null) {
         performUnitOfWork(workInProgress);
