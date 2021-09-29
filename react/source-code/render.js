@@ -17,11 +17,13 @@ function workLoopConcurrent() {
 function performUnitOfWork(unitOfWork) {
     // mount阶段current
     const current = unitOfWork.alternate;
+    // 深度遍历，往下构建节点，并构建fiber tree
     const next = beginWork(current, unitOfWork, subTreeLanes);
 
     unitOfWork.memoizedProps = unitOfWork.pendingProps;
 
     if (next === null) {
+        // 往上递归，更新属性，直到rootFiber
         completeWork(current, unitOfWork, subTreeLanes);
     } else {
         workInProgress = next;
