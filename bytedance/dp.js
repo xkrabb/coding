@@ -54,11 +54,11 @@ var minDistance = function (word1, word2) {
     const len2 = word2.length;
     // word1的i位置，和word2的j位置最小标记距离
     const dp = new Array(len1 + 1).fill(0).map(() => new Array(len2 + 1).fill(0));
-    for (let i = 0; i < len1; i++) {
+    for (let i = 0; i <= len1; i++) {
         // word1的i长度和word2的空
         dp[i][0] = i;
     }
-    for (let j = 0; j < len2; j++) {
+    for (let j = 0; j <= len2; j++) {
         dp[0][j] = j;
     }
     // 空字符占了第一个位，第一个字符需要从1开始
