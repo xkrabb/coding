@@ -49,17 +49,6 @@ console.log(s.push(0), s.push(1), s.push(0), s.getMin(), s.pop(), s.getMin());
 var nextGreaterElement = function (nums1, nums2) {
     const map = {};
     const stack = [];
-    // const len2 = nums2.length;
-    // let i = len2 - 1;
-    // while (i >= 0) {
-    //     const val = nums2[i];
-    //     // 栈里比当前数小的都出栈
-    //     while (stack.length && stack[stack.length - 1] <= val) {
-    //         stack.pop();
-    //     }
-    //     map[val] = stack.length > 0 ? stack[stack.length - 1] : -1;
-    //     stack.push(val);
-    // }
     for (let i = 0; i < nums2.length; i++) {
         while (stack.length && nums2[stack[stack.length - 1]] < nums2[i]) {
             map[nums2[stack[stack.length - 1]]] = nums2[i];
