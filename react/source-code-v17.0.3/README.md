@@ -1,0 +1,1 @@
+`ReactDOMLegacy.js` => `render`
