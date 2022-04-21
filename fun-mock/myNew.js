@@ -18,3 +18,10 @@ function Fn(obj) {
 
 const instance = myNew(Fn, { a: 1, b: 2, c: 3 });
 console.log('keys', Object.keys(instance.obj || {}));
+
+const new1 = (fn, ...arg) => {
+    const obj = {};
+    obj.prototype = Object.create(fn.prototype);
+    const res = fn.call(obj, ...arg);
+    return typeof res === 'object' ? res : obj;
+};

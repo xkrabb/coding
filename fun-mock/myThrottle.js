@@ -58,11 +58,11 @@ function myThrottle(fn, wait, option = {}) {
 
 let count = 0;
 
-function print(info) {
-    console.log('print ', info, ' count ', count);
+function print1(info) {
+    console.log('print1 ', info, ' count ', count);
 }
 
-const throttleFn = myThrottle(print, 1000, { leading: false });
+const throttleFn = myThrottle(print1, 1000, { leading: false });
 
 let inter = setInterval(() => {
     if (count < 20) {

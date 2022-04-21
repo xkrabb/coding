@@ -54,3 +54,5 @@ ev.tiger('call');
 console.log('=========');
 ev.clear();
 ev.tiger('t1');
+
+// on, off, emit, once

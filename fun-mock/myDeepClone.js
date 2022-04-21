@@ -33,8 +33,36 @@ const obj = {
     }
 };
 
+// console.log(JSON.stringify(obj));
+// const cloned = myDeepClone(obj);
+// obj.cur.obj2.c = 33;
+// console.log(JSON.stringify(obj));
+// console.log(JSON.stringify(cloned));
+
+const isObj = (obj) => typeof obj === 'object' && obj !== null;
+
+const deepClone = (obj, map = new WeakMap()) => {
+    if (!isObj(obj)) {
+        return obj;
+    }
+
+    if (map.has(obj)) {
+        return map.get(obj);
+    }
+
+    const res = Array.isArray(obj) ? [] : {};
+    for (const key in obj) {
+        const target = obj[key];
+        res[key] = deepClone(target, map);
+        if (isObj(target)) {
+            map.set(target, res[key]);
+        }
+    }
+    return res;
+};
+
 console.log(JSON.stringify(obj));
-const cloned = myDeepClone(obj);
+const cloned = deepClone(obj);
 obj.cur.obj2.c = 33;
 console.log(JSON.stringify(obj));
 console.log(JSON.stringify(cloned));

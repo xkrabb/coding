@@ -64,3 +64,36 @@ printA.myCall(obj, 'with myCall');
 printA.myApply(obj, ['with myApply']);
 const fun = printA.myBind(obj, 'out params');
 fun('inner params');
+
+Function.prototype.call1 = (context, ...args) => {
+    const ctx = context || window;
+    const fname = Symbol();
+    ctx[fname] = this;
+    const res = ctx[fname](...args);
+    delete ctx[fname];
+    return res;
+};
+Function.prototype.apply1 = (context, arrParam) => {
+    const ctx = context || window;
+    const fname = Symbol();
+    ctx[fname] = this;
+    let res;
+    if (arrParam) {
+        res = ctx[fname](...arrParam);
+    } else {
+        res = ctx[fname]();
+    }
+    delete ctx[fname];
+    return res;
+};
+Function.prototype.bind1 = (context, ...args) => {
+    const ctx = context || window;
+    const that = this;
+
+    const boundFn = (...args1) => {
+        return that.call1(this instanceof boundFn ? this : ctx, ...args, ...args1);
+    };
+
+    boundFn.prototype = Object.create(that.prototype);
+    return boundFn;
+};
