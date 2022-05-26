@@ -4,9 +4,3 @@ function myCreate(proto) {
     F.prototype = proto;
     return new F();
 }
-
-const create1 = (fn) => {
-    const Fn = () => {};
-    obj.prototype = fn;
-    return new Fn();
-};
