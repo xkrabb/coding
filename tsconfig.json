@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+      "target": "ES2016",
+      "noImplicitAny": true,
+      "removeComments": true,
+      "preserveConstEnums": true,
+      "lib": ["ES6", "DOM","ES2016"],
+      "sourceMap": true
+  }
+}

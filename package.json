@@ -4,13 +4,20 @@
 		"mobx": "4.15.x",
 		"mobx-react": "^7.2.1",
 		"react": "^17.0.2",
-		"react-dom": "^17.0.2"
+		"react-dom": "^17.0.2",
+		"typescript": "^5.3.3"
 	},
 	"devDependencies": {
+		"@babel/core": "^7.23.7",
+		"@babel/generator": "^7.23.6",
+		"@babel/parser": "^7.23.6",
 		"husky": "^8.0.0",
 		"lint-staged": "^15.2.0"
 	},
 	"scripts": {
-		"prepare": "husky install"
+		"prepare": "husky install",
+		"ts":"tsc design-patterns/dp-ts/builder.ts",
+		"test": "node design-patterns/dp-ts/builder.js",
+		"py": "python3 py-practice/demo.py"
 	}
 }
