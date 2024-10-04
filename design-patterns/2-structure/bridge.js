@@ -1,5 +1,7 @@
 /**
  * 桥链，将抽象和具体实现分离，解耦
+ * 
+ * 抽象类，扩展抽象类，实现类，具体实现类
  *
  */
 
@@ -7,13 +9,13 @@ class INS1 {
     constructor() {
         console.log('ins1 开始组装');
     }
-    setColor() {
+    setColor () {
         console.log('red');
     }
-    setType() {
+    setType () {
         console.log('big');
     }
-    getResult() {
+    getResult () {
         this.setColor();
         this.setType();
     }
@@ -22,13 +24,13 @@ class INS2 {
     constructor() {
         console.log('ins2 开始组装');
     }
-    setColor() {
+    setColor () {
         console.log('blue');
     }
-    setType() {
+    setType () {
         console.log('small');
     }
-    getResult() {
+    getResult () {
         this.setColor();
         this.setType();
     }
@@ -43,7 +45,7 @@ class Color {
     constructor(color) {
         this.color = color;
     }
-    show() {
+    show () {
         console.log('color is ', this.color);
     }
 }
@@ -51,7 +53,7 @@ class Type {
     constructor(type) {
         this.type = type;
     }
-    show() {
+    show () {
         console.log('type is ', this.type);
     }
 }
@@ -62,7 +64,7 @@ class BridgeProduct {
         this.color = new Color(color);
         this.type = new Type(type);
     }
-    getResult() {
+    getResult () {
         this.color.show();
         this.type.show();
     }
@@ -70,3 +72,48 @@ class BridgeProduct {
 
 new BridgeProduct('blue', 'big').getResult();
 new BridgeProduct('red', 'small').getResult();
+
+
+// =========== 抽象和实现分离 ======
+
+// ts才有interface，此处用class extends
+class Color {
+    getColor () { }
+}
+
+class RedColor extends Color {
+    getColor () {
+        return '#ff0000'
+    }
+}
+class BlurColor extends Color {
+    getColor () {
+        return '#0000ff'
+    }
+}
+
+class Shape {
+    constructor(color) {
+        this.color = color
+    }
+    draw () { }
+}
+
+class Circle extends Shape {
+    constructor(color) {
+        this.color = color
+    }
+    draw () {
+        return this.color.getColor() + ' circle'
+    }
+}
+class Rectangle extends Shape {
+    constructor(color) {
+        this.color = color
+    }
+    draw () {
+        return this.color.getColor() + 'rectangle'
+    }
+}
+
+

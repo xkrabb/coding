@@ -4,6 +4,8 @@
  * 建造者，不同建造者负责组装调用不同产品
  *
  * 扩展只需要增加对应狗建造者
+ * 
+ * 一个产品由多个部分组成，组成逻辑可以由构造器实现
  *
  */
 
@@ -32,10 +34,10 @@ class BuilderA {
     constructor() {
         console.log('建造者A');
     }
-    setA() {
+    setA () {
         this.partA = new PA1();
     }
-    setB() {
+    setB () {
         this.partB = new PB1();
     }
 }
@@ -43,10 +45,10 @@ class BuilderB {
     constructor() {
         console.log('建造者B');
     }
-    setA() {
+    setA () {
         this.partA = new PA2();
     }
-    setB() {
+    setB () {
         this.partB = new PB2();
     }
 }
@@ -55,7 +57,7 @@ class Director {
     constructor() {
         console.log('开始指挥');
     }
-    getBuilder() {
+    getBuilder () {
         console.log('指挥生产 建造者A  产品');
         // 输出构造者构建好的产品
         return new BuilderA();

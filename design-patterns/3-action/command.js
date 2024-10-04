@@ -8,27 +8,27 @@ class MeatCommand {
     constructor(cooker) {
         this.cooker = cooker;
     }
-    execute() {
+    execute () {
         this.cooker.doMeat();
     }
-    undo() {}
+    undo () { }
 }
 
 class FishCommand {
     constructor(cooker) {
         this.cooker = cooker;
     }
-    execute() {
+    execute () {
         this.cooker.doFish();
     }
-    undo() {}
+    undo () { }
 }
 
 class Cooker {
-    doMeat() {
+    doMeat () {
         console.log('厨师烧肉');
     }
-    doFish() {
+    doFish () {
         console.log('厨师做鱼');
     }
 }
@@ -42,3 +42,58 @@ const fishCommand = new FishCommand(cooker);
 // 直接调用，或通过命令管理调用
 meatCommand.execute();
 meatCommand.execute();
+
+
+// 命令，具体命令，接受者，调用者
+class Command {
+    // 接口
+    execute () { }
+}
+
+class Light {
+    turnOn () {
+        console.log('开灯');
+    }
+    turnOff () {
+        console.log('关灯');
+    }
+}
+
+class LightOnCommand extends Command {
+    constructor(light) {
+        this.light = light;
+    }
+    execute () {
+        this.light.turnOn();
+    }
+}
+class LightOffCommand extends Command {
+    constructor(light) {
+        this.light = light;
+    }
+    execute () {
+        this.light.turnOff();
+    }
+}
+
+class Invoker {
+    constructor() {
+        this.command = null;
+    }
+    setCommand (command) {
+        this.command = command;
+    }
+    execute () {
+        this.command.execute();
+    }
+}
+
+const turnOnCommand = new LightOnCommand(new Light());
+const turnOffCommand = new LightOffCommand(new Light());
+const invoker = new Invoker();
+
+invoker.setCommand(turnOnCommand);
+invoker.execute();
+
+invoker.setCommand(turnOffCommand);
+invoker.execute();

@@ -1,15 +1,15 @@
 class Strategy1 {
-    execute() {
+    execute () {
         console.log('选择走路');
     }
 }
 class Strategy2 {
-    execute() {
+    execute () {
         console.log('选择骑自行车');
     }
 }
 class Strategy3 {
-    execute() {
+    execute () {
         console.log('选择开车');
     }
 }
@@ -18,10 +18,10 @@ class Context {
     constructor() {
         this.strategy = null;
     }
-    setStrategy(strategy) {
+    setStrategy (strategy) {
         this.strategy = strategy;
     }
-    doWork() {
+    doWork () {
         this.strategy.execute();
     }
 }

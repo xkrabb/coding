@@ -1,23 +1,23 @@
 class Adaptee1 {
-    show() {
+    show () {
         console.log('两脚插头');
     }
 }
 
 class Adaptee2 {
-    display() {
+    display () {
         console.log('三脚插头');
     }
 }
 
 class ShowAdapter {
-    show() {
+    show () {
         new Adaptee2().display();
     }
 }
-
+// 对已经存在的对象进行兼容处理
 // 传递适配器实例，这样就可以不用修改函数体内调用方法
-function instanceShow(instance) {
+function instanceShow (instance) {
     instance.show();
 }
 

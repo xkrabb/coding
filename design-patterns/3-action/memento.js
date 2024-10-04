@@ -1,20 +1,22 @@
 /**
  * 备忘录模式，隐藏对象内部细节情况，实现撤销与恢复
  * 命令直接操作备忘录对象，备忘录操作命令对象
- *
+ * 
+ * 原发器，备忘录，负责人
+ * 相当于在命令模式基础上，增加了undo/redo功能
  */
 
 class Originator {
     constructor(text) {
         this.text = text || '';
     }
-    insertImg(imgName) {
+    insertImg (imgName) {
         this.text = this.text + 'img:' + imgName;
     }
-    writeWord(word) {
+    writeWord (word) {
         this.text = this.text + word;
     }
-    undo(state) {
+    undo (state) {
         this.text = state.getState();
     }
 }
@@ -25,10 +27,10 @@ class Memento {
         this.state = state;
         this.updateTime = +new Date();
     }
-    getState() {
+    getState () {
         return this.state;
     }
-    getTime() {
+    getTime () {
         return this.updateTime;
     }
 }
@@ -39,15 +41,15 @@ class Caretaker {
         this.originator = originator;
         this.history = [];
     }
-    insertImg(imgName) {
+    insertImg (imgName) {
         this.history.push(new Memento(this.originator.text));
         this.originator.insertImg(imgName);
     }
-    writeWord(word) {
+    writeWord (word) {
         this.history.push(new Memento(this.originator.text));
         this.originator.writeWord(word);
     }
-    undo() {
+    undo () {
         const last = this.history.pop();
         this.originator.undo(last || '');
     }

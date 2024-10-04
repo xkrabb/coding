@@ -1,7 +1,7 @@
 class Component {
-    constructor() {}
-    add() {}
-    scan() {}
+    constructor() { }
+    add () { }
+    scan () { }
 }
 
 class Leaf extends Component {
@@ -9,10 +9,10 @@ class Leaf extends Component {
         super();
         this.name = name;
     }
-    add() {
+    add () {
         return Error('leaf can not add subtree');
     }
-    scan() {
+    scan () {
         console.log('leaf is ', this.name);
     }
 }
@@ -23,10 +23,10 @@ class Composite extends Component {
         this.name = name;
         this.children = [];
     }
-    add(ins) {
+    add (ins) {
         this.children.push(ins);
     }
-    scan() {
+    scan () {
         console.log('composite scan ....');
         this.children.forEach((child) => {
             child.scan();
@@ -49,3 +49,32 @@ branch1.add(leaf3);
 branch2.add(leaf4);
 
 root.scan();
+
+
+// ===== 图形 ======
+class Graphic {
+    draw () { }
+}
+
+class Circle extends Graphic {
+    draw () {
+        console.log('draw circle');
+    }
+}
+
+class CompositeGraphic extends Graphic {
+    constructor() {
+        super();
+        this.children = [];
+    }
+    add (ins) {
+        this.children.push(ins);
+    }
+    draw () {
+        console.log('composite draw....');
+        this.children.forEach((child) => {
+            child.draw();
+        });
+    }
+}
+

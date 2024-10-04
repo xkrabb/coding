@@ -6,12 +6,12 @@
  */
 
 class BaseHandle {
-    constructor() {}
-    setNextHandle(handle) {
+    constructor() { }
+    setNextHandle (handle) {
         this.nextHandle = handle;
         return handle;
     }
-    handle(reqParam) {
+    handle (reqParam) {
         console.log('传递给下一个');
         this.nextHandle?.handle(reqParam);
     }
@@ -22,7 +22,7 @@ class Approval1 extends BaseHandle {
         console.log('审批1');
         super();
     }
-    handle(day) {
+    handle (day) {
         if (day < 1) {
             console.log('小于1天，组长同意即可，流程结束');
         } else {
@@ -36,7 +36,7 @@ class Approval2 extends BaseHandle {
         console.log('审批2');
         super();
     }
-    handle(day) {
+    handle (day) {
         if (day < 2) {
             console.log('小于2天，部门领导同意即可，流程结束');
         } else {
@@ -50,7 +50,7 @@ class Approval3 extends BaseHandle {
         console.log('审批3');
         super();
     }
-    handle(day) {
+    handle (day) {
         if (day > 2) {
             console.log('大于2天，大大领导同意吧，流程结束');
         } else {

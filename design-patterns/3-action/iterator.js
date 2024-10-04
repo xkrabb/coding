@@ -1,6 +1,8 @@
 /**
  * 迭代器
  * 集合内部实现迭代器方法，对外提供迭代器，可以遍历
+ * 
+ * 由迭代器和聚合对象组成
  */
 
 class TestIterator {
@@ -8,18 +10,18 @@ class TestIterator {
         this.collection = coll.collection;
         this.cur = -1;
     }
-    current() {
+    current () {
         if (this.cur === -1) {
             return null;
         } else {
             this.collection[this.cur];
         }
     }
-    next() {
+    next () {
         this.cur++;
         return this.collection[this.cur];
     }
-    hasNext() {
+    hasNext () {
         return Boolean(this.collection[this.cur + 1]);
     }
 }
@@ -30,10 +32,10 @@ class TestCollection {
         this.collection = [];
         this.cur = 0;
     }
-    addItem(key, value) {
+    addItem (key, value) {
         this.collection[this.cur++] = { key, value };
     }
-    getIter() {
+    getIter () {
         return new TestIterator(this);
     }
 }
